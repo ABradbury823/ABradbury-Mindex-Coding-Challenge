@@ -8,30 +8,30 @@ namespace CodeChallenge.Repositories
 {
     public class CompensationRepository : ICompensationRepository
     {
-        private readonly CompensationContext _compensationContext;
+        private readonly EmployeeContext _employeeContext;
         private readonly ILogger<ICompensationRepository> _logger;
 
-        public CompensationRepository(ILogger<ICompensationRepository> logger, CompensationContext compensationContext)
+        public CompensationRepository(ILogger<ICompensationRepository> logger, EmployeeContext employeeContext)
         {
-            _compensationContext = compensationContext;
+            _employeeContext = employeeContext;
             _logger = logger;
         }
 
         public Compensation Add(Compensation compensation)
         {
-            _compensationContext.Compensation.Add(compensation);
+            _employeeContext.Compensation.Add(compensation);
             return compensation;
         }
 
         public Compensation GetByEmployeeId(string employeeId)
         {
-            return _compensationContext.Compensation
+            return _employeeContext.Compensation
                 .SingleOrDefault(c => c.Employee.EmployeeId == employeeId);
         }
 
         public Task SaveAsync()
         {
-            return _compensationContext.SaveChangesAsync();
+            return _employeeContext.SaveChangesAsync();
         }
     }
 }
