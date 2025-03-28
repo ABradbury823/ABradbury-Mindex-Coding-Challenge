@@ -27,9 +27,16 @@ namespace CodeChallenge.Repositories
             return employee;
         }
 
-        public Employee GetById(string id)
+        public Employee GetById(string id, bool includeDirectReports = false)
         {
-            return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
+            return includeDirectReports ?
+                
+                _employeeContext.Employees
+                .Include(e => e.DirectReports)
+                .SingleOrDefault(e => e.EmployeeId == id) : 
+                
+                _employeeContext.Employees
+                .SingleOrDefault(e => e.EmployeeId == id);
         }
 
         public Task SaveAsync()
