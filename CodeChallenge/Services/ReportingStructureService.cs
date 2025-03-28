@@ -2,6 +2,7 @@ using CodeChallenge.Models;
 using CodeChallenge.Repositories;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CodeChallenge.Services
@@ -21,33 +22,45 @@ namespace CodeChallenge.Services
         {
             if (!String.IsNullOrEmpty(employeeId))
             {
-                var employee = ((EmployeeRespository)_employeeRespository).GetByIdNested(employeeId);
-                if (employee != null)
-                {
-                    ReportingStructure reportingStructure = new ReportingStructure();
-                    reportingStructure.Employee = employee;
-                    reportingStructure.NumberOfReports = NumberOfReports(reportingStructure.Employee);
-                    return reportingStructure;
-                }
+                return ConstructReportingStructure(employeeId);
             }
             return null;
         }
 
-        // Implemented recursively under the assumption that the reporting structure is non-circular
-        // We could implement bread/depth-first traversal to account for circular reporting.
-        private int NumberOfReports(Employee employee) 
+        // Implemented using depth-first traversal, in case the reporting hierarchy is circular
+        private ReportingStructure ConstructReportingStructure(String rootEmployeeId)
         {
-            int num = 0;
+            Stack<String> employeeIds = new Stack<String>();
+            Dictionary<String, Employee> visitedEmployees = new Dictionary<String, Employee>();
 
-            if (employee.DirectReports != null && employee.DirectReports.Any())
+            employeeIds.Push(rootEmployeeId);
+
+            while(employeeIds.Any())
             {
-                num += employee.DirectReports.Count;
-                foreach (var e in employee.DirectReports)
+                var employeeId = employeeIds.Pop();
+
+                var employee = ((EmployeeRespository)_employeeRespository).GetByIdNested(employeeId);
+                visitedEmployees.Add(employeeId, employee);
+
+                if (employee.DirectReports != null && employee.DirectReports.Any())
                 {
-                    num += NumberOfReports(e);
+                    foreach(var dr in employee.DirectReports)
+                    {
+                        // account for a looping structure
+                        if (visitedEmployees.ContainsKey(dr.EmployeeId)) continue;
+
+                        employeeIds.Push(dr.EmployeeId);
+                    }
                 }
             }
-            return num;
+
+            var reportingStructure = new ReportingStructure
+            {
+                Employee = visitedEmployees[rootEmployeeId],
+                NumberOfReports = visitedEmployees.Count - 1 // don't count yourself
+            };
+
+            return reportingStructure;
         }
     }
 }
