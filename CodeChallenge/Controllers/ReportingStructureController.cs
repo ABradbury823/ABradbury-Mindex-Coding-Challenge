@@ -12,13 +12,13 @@ namespace CodeChallenge.Controllers
         private readonly ILogger _logger;
         private readonly IReportingStructureService _reportingStructureService;
 
-        public ReportingStructureController(ILogger logger, IReportingStructureService rsService)
+        public ReportingStructureController(ILogger<ReportingStructureController> logger, IReportingStructureService rsService)
         {
             _logger = logger;
             _reportingStructureService = rsService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{employeeId}")]
         public IActionResult GetReportingStructureByEmployeeId(String employeeId)
         {
             _logger.LogDebug($"Received reporting structure get request for employee '{employeeId}'");

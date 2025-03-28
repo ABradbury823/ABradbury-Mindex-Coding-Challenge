@@ -8,9 +8,9 @@ namespace CodeChallenge.Services
     public class ReportingStructureService : IReportingStructureService
     {
         private readonly IEmployeeRepository _employeeRespository;
-        private readonly ILogger _logger;
+        private readonly ILogger<ReportingStructureService> _logger;
 
-        public ReportingStructureService(IEmployeeRepository employeeRespository, ILogger logger)
+        public ReportingStructureService(ILogger<ReportingStructureService> logger, IEmployeeRepository employeeRespository)
         {
             _employeeRespository = employeeRespository;
             _logger = logger;
@@ -20,20 +20,20 @@ namespace CodeChallenge.Services
         {
             if (!String.IsNullOrEmpty(employeeId))
             {
-                ReportingStructure reportingStructure = new ReportingStructure();
-                reportingStructure.Employee = _employeeRespository.GetById(employeeId);
-                if (reportingStructure.Employee != null)
+                var employee = _employeeRespository.GetById(employeeId);
+                if (employee != null)
                 {
+                    ReportingStructure reportingStructure = new ReportingStructure();
+                    reportingStructure.Employee = employee;
                     reportingStructure.NumberOfReports = NumberOfReports(reportingStructure.Employee);
+                    return reportingStructure;
                 }
-                return reportingStructure;
             }
             return null;
         }
 
-        // Helper function for calculating number of reports
-        // We'll do it recursively first, which makes the assumption that direct reporting cannot be circular.
-        // We can then implement breadth-first traversal to account for circular reporting.
+        // Implemented recursively under the assumption that the reporting structure is non-circular
+        // We can then implement depth-first traversal to account for circular reporting.
         private int NumberOfReports(Employee employee) 
         {
             int num = 0;
@@ -41,7 +41,10 @@ namespace CodeChallenge.Services
             if (employee.DirectReports != null)
             {
                 num += employee.DirectReports.Count;
-                num += NumberOfReports(employee);
+                foreach (var e in employee.DirectReports)
+                {
+                    num += NumberOfReports(e);
+                }
             }
             return num;
         }
