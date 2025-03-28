@@ -32,6 +32,14 @@ namespace CodeChallenge.Repositories
             return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
         }
 
+        public Employee GetByIdNested(string id)
+        {
+            // Include only direct reports for DFT report count.
+            return _employeeContext.Employees
+                .Include(e => e.DirectReports)
+                .SingleOrDefault(e => e.EmployeeId == id);
+        }
+
         public Task SaveAsync()
         {
             return _employeeContext.SaveChangesAsync();

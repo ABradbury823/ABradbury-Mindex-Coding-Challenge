@@ -2,6 +2,7 @@ using CodeChallenge.Models;
 using CodeChallenge.Repositories;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace CodeChallenge.Services
 {
@@ -20,7 +21,7 @@ namespace CodeChallenge.Services
         {
             if (!String.IsNullOrEmpty(employeeId))
             {
-                var employee = _employeeRespository.GetById(employeeId);
+                var employee = ((EmployeeRespository)_employeeRespository).GetByIdNested(employeeId);
                 if (employee != null)
                 {
                     ReportingStructure reportingStructure = new ReportingStructure();
@@ -33,12 +34,12 @@ namespace CodeChallenge.Services
         }
 
         // Implemented recursively under the assumption that the reporting structure is non-circular
-        // We can then implement depth-first traversal to account for circular reporting.
+        // We could implement bread/depth-first traversal to account for circular reporting.
         private int NumberOfReports(Employee employee) 
         {
             int num = 0;
 
-            if (employee.DirectReports != null)
+            if (employee.DirectReports != null && employee.DirectReports.Any())
             {
                 num += employee.DirectReports.Count;
                 foreach (var e in employee.DirectReports)
