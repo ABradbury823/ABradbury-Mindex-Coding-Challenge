@@ -39,7 +39,7 @@ namespace CodeChallenge.Services
             {
                 var employeeId = employeeIds.Pop();
 
-                var employee = ((EmployeeRespository)_employeeRespository).GetByIdNested(employeeId);
+                var employee = _employeeRespository.GetById(employeeId, true);
                 visitedEmployees.Add(employeeId, employee);
 
                 if (employee.DirectReports != null && employee.DirectReports.Any())
