@@ -40,18 +40,39 @@ namespace CodeChallenge.Services
                 var employeeId = employeeIds.Pop();
 
                 var employee = _employeeRespository.GetById(employeeId, true);
+
+                // found an invalid employee id
+                if (employee == null) 
+                    return null;
+
                 visitedEmployees.Add(employeeId, employee);
 
-                if (employee.DirectReports != null && employee.DirectReports.Any())
+                if (employee.DirectReports == null || !employee.DirectReports.Any())
+                    continue;
+                
+                for(int i = 0; i < employee.DirectReports.Count; i++)
                 {
-                    foreach(var dr in employee.DirectReports)
+                    var dr = employee.DirectReports[i];
+                    
+                    // account for a looping structure while keeping hierarchy
+                    if (visitedEmployees.ContainsKey(dr.EmployeeId))
                     {
-                        // account for a looping structure
-                        if (visitedEmployees.ContainsKey(dr.EmployeeId)) continue;
-
-                        employeeIds.Push(dr.EmployeeId);
+                        employee.DirectReports.Remove(dr);
+                        employee.DirectReports.Add(new Employee
+                        {
+                            EmployeeId = dr.EmployeeId,
+                            FirstName = dr.FirstName + "(Loop)",
+                            LastName = dr.LastName,
+                            Position = dr.Position,
+                            Department = dr.Department,
+                            DirectReports = null
+                        });
+                        continue;
                     }
+
+                    employeeIds.Push(dr.EmployeeId);
                 }
+                
             }
 
             var reportingStructure = new ReportingStructure
