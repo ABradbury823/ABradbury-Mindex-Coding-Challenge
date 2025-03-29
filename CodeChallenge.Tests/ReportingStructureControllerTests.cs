@@ -47,6 +47,20 @@ namespace CodeCodeChallenge.Tests.Integration
             var reportingStructure = response.DeserializeContent<ReportingStructure>();
             Assert.AreEqual(expectedFirstName, reportingStructure.Employee.FirstName);
             Assert.AreEqual(expectedLastName, reportingStructure.Employee.LastName);
+            
+            /* NOTE: This test runs as expected when the test is run individually,
+             * but throws an exception when the entire test suite is run.
+             * While I couldn't find a solution, I had been encounterting similar 
+             * issues like this while implmenting the Tasks. 
+             * The problem seems to be related to how EF handles loading of objects
+             * nested within entities, like DirectReports. I should be accounting for
+             * this in the Employee repository with the .Include() method, but for
+             * whatever reason, when the data is retrieved too quickly, the nested
+             * objects are not all loaded. Stepping through the program line-by-line
+             * was also unable to find the issue, as the extra time taken by manually 
+             * stepping through lines gives the repository the time it needs to load
+             * all nested objects.
+             */
             Assert.AreEqual(expectedNumReports, reportingStructure.NumberOfReports);
         }
 
