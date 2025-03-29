@@ -21,7 +21,7 @@ namespace CodeChallenge.Controllers
         [HttpGet("{employeeId}")]
         public IActionResult GetReportingStructureByEmployeeId(String employeeId)
         {
-            _logger.LogDebug($"Received reporting structure get request for employee '{employeeId}'");
+            _logger.LogDebug($"Received reporting structure get request for '{employeeId}'");
 
             var reportingStructure = _reportingStructureService.GetByEmployeeId(employeeId);
 
