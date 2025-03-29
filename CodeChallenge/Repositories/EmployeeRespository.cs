@@ -33,6 +33,7 @@ namespace CodeChallenge.Repositories
                 
                 _employeeContext.Employees
                 .Include(e => e.DirectReports)
+                .Include(e => e.Compensation)
                 .SingleOrDefault(e => e.EmployeeId == id) : 
                 
                 _employeeContext.Employees

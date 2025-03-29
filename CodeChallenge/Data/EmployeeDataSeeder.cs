@@ -62,6 +62,11 @@ namespace CodeChallenge.Data
                     });
                     employee.DirectReports = referencedEmployees;
                 }
+
+                if(employee.Compensation != null)
+                {
+                    employee.Compensation.EmployeeId = employee.EmployeeId;
+                }
             });
         }
     }
