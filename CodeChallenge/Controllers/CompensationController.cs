@@ -23,12 +23,12 @@ namespace CodeChallenge.Controllers
         public IActionResult CreateCompensation([FromBody] Compensation compensation)
         {
             _logger.LogDebug($"Received compensation create request for '" +
-                $"{compensation.Employee.FirstName} {compensation.Employee.LastName}'");
+                $"{compensation.EmployeeId}'");
 
             _compensationService.Create(compensation);
 
             return CreatedAtRoute("getCompensationByEmployeeId",
-                new { employeeId = compensation.Employee.EmployeeId },
+                new { employeeId = compensation.EmployeeId },
                 compensation
                 );
         }
